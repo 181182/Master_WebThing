@@ -22,20 +22,28 @@ public class PD1 {
     private static Value<Double> gravityLevel;
     private static Value<Double> pHLevel;
     private static Value<Double> temperatureLevel;
+    private static Value<Double> salinityLevel;
+    private static Value<Double> turbidityLevel;
+    private static Value<Double> tomopraghy;
+    private static Value<Double> resonance;
+    private static Value<Double> pipeline;
 
     public static Thing makeThing() {
 
+        //Defining the first PD
         Thing thing = new Thing("PD1",
-                                "PD1",
-                                new JSONArray(Arrays.asList("MultiLevelSensor")),
-                                "Sensor for underwater technology");
+                "PD1",
+                new JSONArray(Arrays.asList("MultiLevelSensor")),
+                "Sensor for underwater technology");
 
+        //Event
         JSONObject gasLeakageProperty = new JSONObject();
         gasLeakageProperty.put("description",
-                               "Event for GasLeakage");
+                "Event for GasLeakage");
         gasLeakageProperty.put("type", "boolean");
         thing.addAvailableEvent("GasLeakage", gasLeakageProperty);
 
+        //Properties
         JSONObject CO2Properyy = new JSONObject();
         CO2Properyy.put("@type", "LevelProperty");
         CO2Properyy.put("title", "CO2");
@@ -47,9 +55,9 @@ public class PD1 {
         CO2Properyy.put("readOnly", true);
         CO2level = new Value<>(0.0);
         thing.addProperty(new Property(thing,
-                                      "CO2",
-                                      CO2level,
-                                      CO2Properyy));
+                "CO2",
+                CO2level,
+                CO2Properyy));
 
         JSONObject gravityProperty = new JSONObject();
         gravityProperty.put("@type", "LevelProperty");
@@ -59,9 +67,9 @@ public class PD1 {
         gravityProperty.put("readOnly", true);
         gravityLevel = new Value<>(0.0);
         thing.addProperty(new Property(thing,
-                                       "Gravity",
-                                       gravityLevel,
-                                       gravityProperty));
+                "Gravity",
+                gravityLevel,
+                gravityProperty));
 
         JSONObject pHProperty = new JSONObject();
         pHProperty.put("@type", "LevelProperty");
@@ -77,8 +85,24 @@ public class PD1 {
         temperatureProperty.put("title", "Temperature");
         temperatureProperty.put("description", "The current temperature in celsius");
         temperatureProperty.put("unit", "degree celsius");
-        temperatureProperty.put("readOnly", "true");
+        temperatureProperty.put("readOnly", true);
         temperatureLevel = new Value<>(0.0);
+        thing.addProperty(new Property(thing, "Temperature", temperatureLevel, temperatureProperty));
+
+        JSONObject salinityProperty = new JSONObject();
+        salinityProperty.put("@type", "LevelProperty");
+        salinityProperty.put("title", "Salinity");
+        salinityProperty.put("description", "The current Salinity in parts per thousand");
+        salinityProperty.put("readOnly", true);
+        salinityLevel = new Value<>(0.0);
+        thing.addProperty(new Property(thing, "Salinity", salinityLevel, salinityProperty));
+
+        JSONObject turbidityProperty = new JSONObject();
+        turbidityProperty.put("@type", "LevelProperty");
+        turbidityProperty.put("title", "Turbidity");
+        turbidityProperty.put("description", "The current Turbidity in FTU");
+        turbidityProperty.put("readOnly", true);
+        turbidityLevel = new Value<>(0.0);
 
 
         // Start a thread that polls the sensor reading every 3 seconds
@@ -91,18 +115,36 @@ public class PD1 {
                     double newLevel = readCO2();
                     double newGravity = readGravity();
                     double newpH = readpH();
-                    if(CO2level.get() < 20){
+                    double newTemperature = readTemperature();
+                    double newSalinity = readSalinity();
+                    double newTurbitity = readTurbidity();
+
+                    //Event handler
+                    if (CO2level.get() < 20) {
                         thing.addEvent(new GasLeakageEvent(thing, true));
                     }
+
+                    //Terminal messages
                     System.out.printf("setting new CO2 level: %f\n",
-                                      newLevel);
+                            newLevel);
                     System.out.printf("setting new Gravity level: %f\n",
-                                      newGravity);
+                            newGravity);
                     System.out.printf("setting new pH level: %f\n",
-                                      newpH);
+                            newpH);
+                    System.out.printf("setting new Temperature: %f\n",
+                            newTemperature);
+                    System.out.printf("setting new Salinity: %f\n",
+                            newSalinity);
+                    System.out.printf("setting new Turbitity: %f\n",
+                            newTurbitity);
+
+                    //Update Value
                     CO2level.notifyOfExternalUpdate(newLevel);
                     gravityLevel.notifyOfExternalUpdate(newGravity);
                     pHLevel.notifyOfExternalUpdate(newpH);
+                    temperatureLevel.notifyOfExternalUpdate(newTemperature);
+                    salinityLevel.notifyOfExternalUpdate(newSalinity);
+                    turbidityLevel.notifyOfExternalUpdate(newTurbitity);
 
                 } catch (InterruptedException e) {
                     throw new IllegalStateException(e);
@@ -112,32 +154,37 @@ public class PD1 {
 
         return thing;
     }
+
     private static double readCO2() {
         return Math.abs(70.0d * Math.random() * (-0.5 + Math.random()));
     }
+
     private static double readGravity() {
         return Math.abs(70.0d * Math.random() * (-0.5 + Math.random()));
     }
-    private static double readpH(){
+
+    private static double readpH() {
         return Math.abs(70.0d * Math.random() * (-0.5 + Math.random()));
     }
 
-    public static class GasLeakageEvent extends Event {
-        public GasLeakageEvent(Thing thing, boolean data) {
-            super(thing, "GasLeakage", data);
-        }
+    private static double readTemperature() {
+        return Math.abs(70.0d * Math.random() * (-0.5 + Math.random()));
     }
 
+    private static double readSalinity() {
+        return Math.abs(70.0d * Math.random() * (-0.5 + Math.random()));
+    }
 
-
-    private static Value<Double> tomopraghy;
+    private static double readTurbidity() {
+        return Math.abs(70.0d * Math.random() * (-0.5 + Math.random()));
+    }
 
     public static Thing makeSecondThing() {
 
         Thing thing = new Thing("PD2",
-                                "PD2",
-                                new JSONArray(Arrays.asList("MultiLevelSensor")),
-                                "Sensor for underwater technology");
+                "PD2",
+                new JSONArray(Arrays.asList("MultiLevelSensor")),
+                "Sensor for underwater technology");
 
         JSONObject acousticTomographyProperty = new JSONObject();
         acousticTomographyProperty.put("@type", "FrequencyProperty");
@@ -148,9 +195,9 @@ public class PD1 {
         acousticTomographyProperty.put("readOnly", true);
         tomopraghy = new Value<>(0.0);
         thing.addProperty(new Property(thing,
-                                       "Acoustic Tomography",
-                                       tomopraghy,
-                                       acousticTomographyProperty));
+                "Acoustic Tomography",
+                tomopraghy,
+                acousticTomographyProperty));
 
         // Start a thread that polls the sensor reading every 3 seconds
         new Thread(() -> {
@@ -161,7 +208,7 @@ public class PD1 {
                     // all listeners
                     double newFrequency = readTomoprahy();
                     System.out.printf("setting new Acoustic Tomography frequency: %f\n",
-                                      newFrequency);
+                            newFrequency);
                     tomopraghy.notifyOfExternalUpdate(newFrequency);
                 } catch (InterruptedException e) {
                     throw new IllegalStateException(e);
@@ -171,20 +218,17 @@ public class PD1 {
 
         return thing;
     }
+
     private static double readTomoprahy() {
         return Math.abs(70.0d * Math.random() * (-0.5 + Math.random()));
     }
 
-
-    private static Value<Double> resonance;
-
-
     public static Thing makeThirdThing() {
 
         Thing thing = new Thing("PD3",
-                                "PD3",
-                                new JSONArray(Arrays.asList("MultiLevelSensor")),
-                                "Sensor for underwater technology");
+                "PD3",
+                new JSONArray(Arrays.asList("MultiLevelSensor")),
+                "Sensor for underwater technology");
 
         JSONObject acousticResonanceProperty = new JSONObject();
         acousticResonanceProperty.put("@type", "FrequencyProperty");
@@ -195,9 +239,9 @@ public class PD1 {
         acousticResonanceProperty.put("readOnly", true);
         resonance = new Value<>(0.0);
         thing.addProperty(new Property(thing,
-                                       "Acoustic Resonance",
-                                       resonance,
-                                       acousticResonanceProperty));
+                "Acoustic Resonance",
+                resonance,
+                acousticResonanceProperty));
 
         // Start a thread that polls the sensor reading every 3 seconds
         new Thread(() -> {
@@ -208,7 +252,7 @@ public class PD1 {
                     // all listeners
                     double newFrequency = readResonance();
                     System.out.printf("setting new Acoustic Resonance frequency: %f\n",
-                                      newFrequency);
+                            newFrequency);
                     resonance.notifyOfExternalUpdate(newFrequency);
                 } catch (InterruptedException e) {
                     throw new IllegalStateException(e);
@@ -223,15 +267,12 @@ public class PD1 {
         return Math.abs(70.0d * Math.random() * (-0.5 + Math.random()));
     }
 
-
-    private static Value<Double> pipeline;
-
     public static Thing makeFourthThing() {
 
         Thing thing = new Thing("PD4",
-                                "PD4",
-                                new JSONArray(Arrays.asList("MultiLevelSensor")),
-                                "PD4 Sensor for underwater technology");
+                "PD4",
+                new JSONArray(Arrays.asList("MultiLevelSensor")),
+                "PD4 Sensor for underwater technology");
 
         JSONObject pipelineVibrationsProperty = new JSONObject();
         pipelineVibrationsProperty.put("@type", "FrequencyProperty");
@@ -242,9 +283,9 @@ public class PD1 {
         pipelineVibrationsProperty.put("readOnly", true);
         pipeline = new Value<>(0.0);
         thing.addProperty(new Property(thing,
-                                       "Pipeline Vibrations (DAS)",
-                                       pipeline,
-                                       pipelineVibrationsProperty));
+                "Pipeline Vibrations (DAS)",
+                pipeline,
+                pipelineVibrationsProperty));
 
         // Start a thread that polls the sensor reading every 3 seconds
         new Thread(() -> {
@@ -255,7 +296,7 @@ public class PD1 {
                     // all listeners
                     double newFrequency = readPipelineVibrations();
                     System.out.printf("setting new Pipeline Vibrations (DAS) frequency: %f\n",
-                                      newFrequency);
+                            newFrequency);
                     pipeline.notifyOfExternalUpdate(newFrequency);
                 } catch (InterruptedException e) {
                     throw new IllegalStateException(e);
@@ -284,8 +325,8 @@ public class PD1 {
             things.add(fourthThing);
             // If adding more than one thing, use MultipleThings() with a name.
             // In the single thing case, the thing's name will be broadcast.
-            WebThingServer server = new WebThingServer(new WebThingServer.MultipleThings(things,"PD1AndPD2Device"),
-                                        8888);
+            WebThingServer server = new WebThingServer(new WebThingServer.MultipleThings(things, "PD1AndPD2Device"),
+                    8888);
 
             Runtime.getRuntime().addShutdownHook(new Thread() {
                 public void run() {
@@ -297,6 +338,12 @@ public class PD1 {
         } catch (IOException e) {
             System.out.println(e);
             System.exit(1);
+        }
+    }
+
+    public static class GasLeakageEvent extends Event {
+        public GasLeakageEvent(Thing thing, boolean data) {
+            super(thing, "GasLeakage", data);
         }
     }
 
