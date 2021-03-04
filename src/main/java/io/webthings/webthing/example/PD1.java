@@ -83,6 +83,7 @@ public class PD1 {
         JSONObject temperatureProperty = new JSONObject();
         temperatureProperty.put("@type", "TemperatureProperty");
         temperatureProperty.put("title", "Temperature");
+        temperatureProperty.put("type", "number");
         temperatureProperty.put("description", "The current temperature in celsius");
         temperatureProperty.put("unit", "degree celsius");
         temperatureProperty.put("readOnly", true);
@@ -92,6 +93,7 @@ public class PD1 {
         JSONObject salinityProperty = new JSONObject();
         salinityProperty.put("@type", "LevelProperty");
         salinityProperty.put("title", "Salinity");
+        salinityProperty.put("type", "number");
         salinityProperty.put("description", "The current Salinity in parts per thousand");
         salinityProperty.put("readOnly", true);
         salinityLevel = new Value<>(0.0);
@@ -100,6 +102,7 @@ public class PD1 {
         JSONObject turbidityProperty = new JSONObject();
         turbidityProperty.put("@type", "LevelProperty");
         turbidityProperty.put("title", "Turbidity");
+        turbidityProperty.put("type", "number");
         turbidityProperty.put("description", "The current Turbidity in FTU");
         turbidityProperty.put("readOnly", true);
         turbidityLevel = new Value<>(0.0);
