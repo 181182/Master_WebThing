@@ -18,13 +18,19 @@ import java.util.UUID;
 
 public class PD1 {
 
+    //PD1 Values
     private static Value<Double> CO2level;
     private static Value<Double> gravityLevel;
     private static Value<Double> pHLevel;
     private static Value<Double> temperatureLevel;
     private static Value<Double> salinityLevel;
     private static Value<Double> turbidityLevel;
-    private static Value<Double> tomopraghy;
+
+    //PD2 Values
+    private static Value<Double> acousticTomopraghyLevel;
+    private static Value<Double> geoPositioningLevel;
+    private static Value<Double> acousticEnvironmentLevel;
+    private static Value<Double> oceanographicPointLevel;
     private static Value<Double> resonance;
     private static Value<Double> pipeline;
 
@@ -196,11 +202,40 @@ public class PD1 {
         acousticTomographyProperty.put("description", "The current Acoustic Tomography in Hertz");
         acousticTomographyProperty.put("unit", "hertz");
         acousticTomographyProperty.put("readOnly", true);
-        tomopraghy = new Value<>(0.0);
+        acousticTomopraghyLevel = new Value<>(0.0);
         thing.addProperty(new Property(thing,
                 "Acoustic Tomography",
-                tomopraghy,
+                acousticTomopraghyLevel,
                 acousticTomographyProperty));
+
+        JSONObject geopositioningProperty = new JSONObject();
+        geopositioningProperty.put("@type", "LevelProperty");
+        geopositioningProperty.put("title", "Geo-Positioning");
+        geopositioningProperty.put("type", "number");
+        geopositioningProperty.put("description", "The Geo-Positioning in coordinates");
+        geopositioningProperty.put("readOnly", true);
+        geoPositioningLevel = new Value<>(0.0);
+        thing.addProperty(new Property(thing, "Geo-Positioning", geoPositioningLevel, geopositioningProperty));
+
+        JSONObject acousticEnvironmentProperty = new JSONObject();
+        acousticEnvironmentProperty.put("@type", "FrequencyProperty");
+        acousticEnvironmentProperty.put("title", "Acoustic Environment");
+        acousticEnvironmentProperty.put("type", "number");
+        acousticEnvironmentProperty.put("description", "The Acoustic Environment in Hertz");
+        acousticEnvironmentProperty.put("unit", "hertz");
+        acousticEnvironmentProperty.put("readOnly", true);
+        acousticEnvironmentLevel = new Value<>(0.0);
+        thing.addProperty(new Property(thing, "Acoustic Environment", acousticEnvironmentLevel, acousticEnvironmentProperty));
+
+        JSONObject oceanographicPointProperty = new JSONObject();
+        oceanographicPointProperty.put("@type", "LevelProperty");
+        oceanographicPointProperty.put("title", "Oceanographic Point");
+        oceanographicPointProperty.put("type", "number");
+        oceanographicPointProperty.put("description", "The Oceanographic Point in coordinates");
+        oceanographicPointProperty.put("readOnly", true);
+        oceanographicPointLevel = new Value<>(0.0);
+        thing.addProperty(new Property(thing, "Oceanographic Point", oceanographicPointLevel, oceanographicPointProperty));
+
 
         // Start a thread that polls the sensor reading every 3 seconds
         new Thread(() -> {
@@ -209,10 +244,25 @@ public class PD1 {
                     Thread.sleep(3000);
                     // Update the underlying value, which in turn notifies
                     // all listeners
-                    double newFrequency = readTomoprahy();
+                    double newAcousticTomography = readAcousticTomoprahy();
+                    double newGeopositioning = readGeopositioning();
+                    double newAcousticEnvironment = readAcousticEnvironment();
+                    double newoceanographicPoint = readoceanographicPoint();
+
                     System.out.printf("setting new Acoustic Tomography frequency: %f\n",
-                            newFrequency);
-                    tomopraghy.notifyOfExternalUpdate(newFrequency);
+                            newAcousticTomography);
+                    System.out.printf("setting new Geo-Positioning: %f\n",
+                            newGeopositioning);
+                    System.out.printf("setting new Acoustic Environment frequency: %f\n",
+                            newAcousticEnvironment);
+                    System.out.printf("setting new Acoustic Environment frequency: %f\n",
+                            newoceanographicPoint);
+
+                    acousticTomopraghyLevel.notifyOfExternalUpdate(newAcousticTomography);
+                    geoPositioningLevel.notifyOfExternalUpdate(newGeopositioning);
+                    acousticEnvironmentLevel.notifyOfExternalUpdate(newAcousticEnvironment);
+                    oceanographicPointLevel.notifyOfExternalUpdate(newoceanographicPoint);
+
                 } catch (InterruptedException e) {
                     throw new IllegalStateException(e);
                 }
@@ -222,9 +272,19 @@ public class PD1 {
         return thing;
     }
 
-    private static double readTomoprahy() {
+    private static double readAcousticTomoprahy() {
         return Math.abs(70.0d * Math.random() * (-0.5 + Math.random()));
     }
+    private static double readGeopositioning() {
+        return Math.abs(70.0d * Math.random() * (-0.5 + Math.random()));
+    }
+    private static double readAcousticEnvironment() {
+        return Math.abs(70.0d * Math.random() * (-0.5 + Math.random()));
+    }
+    private static double readoceanographicPoint() {
+        return Math.abs(70.0d * Math.random() * (-0.5 + Math.random()));
+    }
+
 
     public static Thing makeThirdThing() {
 
