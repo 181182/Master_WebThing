@@ -31,7 +31,10 @@ public class PD1 {
     private static Value<Double> geoPositioningLevel;
     private static Value<Double> acousticEnvironmentLevel;
     private static Value<Double> oceanographicPointLevel;
-    private static Value<Double> resonance;
+
+    //PD3 Values
+    private static Value<Double> acousticResonanceLevel;
+    private static Value<Double> GUWPD3Level;
     private static Value<Double> pipeline;
 
     public static Thing makeThing() {
@@ -300,11 +303,20 @@ public class PD1 {
         acousticResonanceProperty.put("description", "The current Acoustic Resonance in Hertz");
         acousticResonanceProperty.put("unit", "hertz");
         acousticResonanceProperty.put("readOnly", true);
-        resonance = new Value<>(0.0);
+        acousticResonanceLevel = new Value<>(0.0);
         thing.addProperty(new Property(thing,
                 "Acoustic Resonance",
-                resonance,
+                acousticResonanceLevel,
                 acousticResonanceProperty));
+
+        JSONObject GUWProperty = new JSONObject();
+        acousticResonanceProperty.put("@type", "LevelProperty");
+        acousticResonanceProperty.put("title", "GUW Measurements");
+        acousticResonanceProperty.put("type", "number");
+        acousticResonanceProperty.put("description", "The current GUW Measurements");
+        acousticResonanceProperty.put("readOnly", true);
+        GUWPD3Level = new Value<>(0.0);
+        thing.addProperty(new Property(thing, "GUW Measurements", GUWPD3Level, acousticResonanceProperty));
 
         // Start a thread that polls the sensor reading every 3 seconds
         new Thread(() -> {
@@ -313,10 +325,16 @@ public class PD1 {
                     Thread.sleep(3000);
                     // Update the underlying value, which in turn notifies
                     // all listeners
-                    double newFrequency = readResonance();
+                    double newAcousticResonance = readResonance();
+                    double newGUWPD3 = readGUWPD3();
+
                     System.out.printf("setting new Acoustic Resonance frequency: %f\n",
-                            newFrequency);
-                    resonance.notifyOfExternalUpdate(newFrequency);
+                            newAcousticResonance);
+                    System.out.printf("setting new GUW Measurements: %f\n",
+                            newAcousticResonance);
+
+                    acousticResonanceLevel.notifyOfExternalUpdate(newAcousticResonance);
+                    GUWPD3Level.notifyOfExternalUpdate(newGUWPD3);
                 } catch (InterruptedException e) {
                     throw new IllegalStateException(e);
                 }
@@ -327,6 +345,9 @@ public class PD1 {
     }
 
     private static double readResonance() {
+        return Math.abs(70.0d * Math.random() * (-0.5 + Math.random()));
+    }
+    private static double readGUWPD3() {
         return Math.abs(70.0d * Math.random() * (-0.5 + Math.random()));
     }
 
