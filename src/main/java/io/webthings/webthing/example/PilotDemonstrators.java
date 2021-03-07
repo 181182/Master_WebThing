@@ -163,6 +163,7 @@ public class PilotDemonstrators {
         return thing;
     }
 
+    //Placeholder for sensor 
     private static double readCO2() {
         return Math.abs(70.0d * Math.random() * (-0.5 + Math.random()));
     }
