@@ -1,22 +1,15 @@
 package io.webthings.webthing.example;
 
+import io.webthings.webthing.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import io.webthings.webthing.Action;
-import io.webthings.webthing.Event;
-import io.webthings.webthing.Property;
-import io.webthings.webthing.Thing;
-import io.webthings.webthing.Value;
-import io.webthings.webthing.WebThingServer;
-import io.webthings.webthing.errors.PropertyError;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
-public class PD1 {
+public class PilotDemonstrators {
 
     //PD1 Values
     private static Value<Double> CO2level;
@@ -35,9 +28,12 @@ public class PD1 {
     //PD3 Values
     private static Value<Double> acousticResonanceLevel;
     private static Value<Double> GUWPD3Level;
-    private static Value<Double> pipeline;
 
-    public static Thing makeThing() {
+    //PD4 Values
+    private static Value<Double> pipelineVibrationsLevel;
+    private static Value<Double> GUWPD4Level;
+
+    public static Thing makeFirstThing() {
 
         //Defining the first PD
         Thing thing = new Thing("PD1",
@@ -278,12 +274,15 @@ public class PD1 {
     private static double readAcousticTomoprahy() {
         return Math.abs(70.0d * Math.random() * (-0.5 + Math.random()));
     }
+
     private static double readGeopositioning() {
         return Math.abs(70.0d * Math.random() * (-0.5 + Math.random()));
     }
+
     private static double readAcousticEnvironment() {
         return Math.abs(70.0d * Math.random() * (-0.5 + Math.random()));
     }
+
     private static double readoceanographicPoint() {
         return Math.abs(70.0d * Math.random() * (-0.5 + Math.random()));
     }
@@ -310,13 +309,13 @@ public class PD1 {
                 acousticResonanceProperty));
 
         JSONObject GUWProperty = new JSONObject();
-        acousticResonanceProperty.put("@type", "LevelProperty");
-        acousticResonanceProperty.put("title", "GUW Measurements");
-        acousticResonanceProperty.put("type", "number");
-        acousticResonanceProperty.put("description", "The current GUW Measurements");
-        acousticResonanceProperty.put("readOnly", true);
+        GUWProperty.put("@type", "LevelProperty");
+        GUWProperty.put("title", "GUW Measurements");
+        GUWProperty.put("type", "number");
+        GUWProperty.put("description", "The current GUW Measurements");
+        GUWProperty.put("readOnly", true);
         GUWPD3Level = new Value<>(0.0);
-        thing.addProperty(new Property(thing, "GUW Measurements", GUWPD3Level, acousticResonanceProperty));
+        thing.addProperty(new Property(thing, "GUW Measurements", GUWPD3Level, GUWProperty));
 
         // Start a thread that polls the sensor reading every 3 seconds
         new Thread(() -> {
@@ -347,6 +346,7 @@ public class PD1 {
     private static double readResonance() {
         return Math.abs(70.0d * Math.random() * (-0.5 + Math.random()));
     }
+
     private static double readGUWPD3() {
         return Math.abs(70.0d * Math.random() * (-0.5 + Math.random()));
     }
@@ -365,11 +365,20 @@ public class PD1 {
         pipelineVibrationsProperty.put("description", "The current Pipeline Vibrations in Hertz");
         pipelineVibrationsProperty.put("unit", "hertz");
         pipelineVibrationsProperty.put("readOnly", true);
-        pipeline = new Value<>(0.0);
+        pipelineVibrationsLevel = new Value<>(0.0);
         thing.addProperty(new Property(thing,
                 "Pipeline Vibrations (DAS)",
-                pipeline,
+                pipelineVibrationsLevel,
                 pipelineVibrationsProperty));
+
+        JSONObject GUWProperty = new JSONObject();
+        GUWProperty.put("@type", "LevelProperty");
+        GUWProperty.put("title", "GUW Measurements");
+        GUWProperty.put("type", "number");
+        GUWProperty.put("description", "The current GUW Measurements");
+        GUWProperty.put("readOnly", true);
+        GUWPD4Level = new Value<>(0.0);
+        thing.addProperty(new Property(thing, "GUW Measurements", GUWPD4Level, GUWProperty));
 
         // Start a thread that polls the sensor reading every 3 seconds
         new Thread(() -> {
@@ -378,10 +387,16 @@ public class PD1 {
                     Thread.sleep(3000);
                     // Update the underlying value, which in turn notifies
                     // all listeners
-                    double newFrequency = readPipelineVibrations();
+                    double newPipelineVibrations = readPipelineVibrations();
+                    double newGUWPD4 = readGUWPD4();
+
                     System.out.printf("setting new Pipeline Vibrations (DAS) frequency: %f\n",
-                            newFrequency);
-                    pipeline.notifyOfExternalUpdate(newFrequency);
+                            newPipelineVibrations);
+                    System.out.printf("setting new GUW Measurements: %f\n",
+                            newPipelineVibrations);
+
+                    pipelineVibrationsLevel.notifyOfExternalUpdate(newPipelineVibrations);
+                    GUWPD4Level.notifyOfExternalUpdate(newPipelineVibrations);
                 } catch (InterruptedException e) {
                     throw new IllegalStateException(e);
                 }
@@ -395,8 +410,13 @@ public class PD1 {
         return Math.abs(70.0d * Math.random() * (-0.5 + Math.random()));
     }
 
+    private static double readGUWPD4() {
+        return Math.abs(70.0d * Math.random() * (-0.5 + Math.random()));
+    }
+
+
     public static void main(String[] args) {
-        Thing firstThing = makeThing();
+        Thing firstThing = makeFirstThing();
         Thing secondThing = makeSecondThing();
         Thing thirdThing = makeThirdThing();
         Thing fourthThing = makeFourthThing();
