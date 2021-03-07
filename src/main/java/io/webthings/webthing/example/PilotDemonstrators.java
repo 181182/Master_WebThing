@@ -168,6 +168,7 @@ public class PilotDemonstrators {
         return Math.abs(70.0d * Math.random() * (-0.5 + Math.random()));
     }
 
+    //Placeholder for sensor
     private static double readGravity() {
         return Math.abs(70.0d * Math.random() * (-0.5 + Math.random()));
     }
@@ -325,6 +326,7 @@ public class PilotDemonstrators {
                     Thread.sleep(3000);
                     // Update the underlying value, which in turn notifies
                     // all listeners
+
                     double newAcousticResonance = readResonance();
                     double newGUWPD3 = readGUWPD3();
 
