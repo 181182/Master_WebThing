@@ -358,6 +358,13 @@ public class PilotDemonstrators {
                 new JSONArray(Arrays.asList("MultiLevelSensor")),
                 "PD4 Sensor for underwater technology");
 
+        //Event
+        JSONObject gasLeakageProperty = new JSONObject();
+        gasLeakageProperty.put("description",
+                               "Event for GasLeakage");
+        gasLeakageProperty.put("type", "boolean");
+        thing.addAvailableEvent("GasLeakage", gasLeakageProperty);
+
         JSONObject pipelineVibrationsProperty = new JSONObject();
         pipelineVibrationsProperty.put("@type", "FrequencyProperty");
         pipelineVibrationsProperty.put("title", "Pipeline Vibrations (DAS)");
@@ -385,6 +392,11 @@ public class PilotDemonstrators {
             while (true) {
                 try {
                     Thread.sleep(3000);
+
+                    if(Math.random() > 0.7) {
+                        thing.addEvent(new GasLeakageEvent(thing, true));
+                    }
+
                     // Update the underlying value, which in turn notifies
                     // all listeners
                     double newPipelineVibrations = readPipelineVibrations();
@@ -396,7 +408,7 @@ public class PilotDemonstrators {
                             newPipelineVibrations);
 
                     pipelineVibrationsLevel.notifyOfExternalUpdate(newPipelineVibrations);
-                    GUWPD4Level.notifyOfExternalUpdate(newPipelineVibrations);
+                    GUWPD4Level.notifyOfExternalUpdate(newGUWPD4);
                 } catch (InterruptedException e) {
                     throw new IllegalStateException(e);
                 }
@@ -429,7 +441,7 @@ public class PilotDemonstrators {
             things.add(fourthThing);
             // If adding more than one thing, use MultipleThings() with a name.
             // In the single thing case, the thing's name will be broadcast.
-            WebThingServer server = new WebThingServer(new WebThingServer.MultipleThings(things, "PD1AndPD2Device"),
+            WebThingServer server = new WebThingServer(new WebThingServer.MultipleThings(things, "Pilot Demonstrators"),
                     8888);
 
             Runtime.getRuntime().addShutdownHook(new Thread() {
