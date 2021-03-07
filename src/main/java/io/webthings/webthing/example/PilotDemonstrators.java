@@ -457,6 +457,7 @@ public class PilotDemonstrators {
         }
     }
 
+    //Function for Event
     public static class GasLeakageEvent extends Event {
         public GasLeakageEvent(Thing thing, boolean data) {
             super(thing, "GasLeakage", data);
